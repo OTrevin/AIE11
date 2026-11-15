@@ -8,6 +8,25 @@ from .index import Hit, client
 
 CHAT_MODEL = "gpt-4.1-mini"
 
+RAG_SYSTEM_TEMPLATE = """You are a helpful personal wellness assistant that answers health and wellness questions based strictly on provided context.
+
+Instructions:
+- Only answer questions using information from the provided context
+- If the context doesn't contain relevant information, respond with "I don't have information about that in my wellness knowledge base"
+- Be accurate and cite the same [chunk N] label that appears before each chunk in the context after each claim.
+- Keep responses succinct, focusing on the most relevant information.
+- Only use the provided context. Do not use external knowledge.
+- Include a gentle reminder that users should consult healthcare professionals for medical advice when appropriate
+- Only provide answers when you are confident the context supports your response."""
+
+RAG_USER_TEMPLATE = """Context Information:
+{context}
+
+Number of relevant sources found: {context_count}
+
+Question: {user_query}
+
+Please provide your answer based solely on the context above."""
 
 def build_messages(question: str, hits: list[Hit]) -> list[dict]:
     """Assemble the messages list sent to the chat model.
@@ -31,7 +50,22 @@ def build_messages(question: str, hits: list[Hit]) -> list[dict]:
     Hint: Session 2's RAG_SYSTEM_TEMPLATE is a good starting point, and a
     better one once you have read Step 3's failures and edited it.
     """
-    raise NotImplementedError("Write build_messages() in retrieval_app/answer.py")
+    context_blocks = []
+   
+    for hit in hits:
+        label = f"[chunk {hit.chunk_id}]"
+        labeled_text = f"{label} {hit.text}"
+        context_blocks.append(labeled_text)
+
+    if not context_blocks:
+        context = "No hits were retrieved."
+    else:
+        context = "\n\n".join(context_blocks)
+
+    system_message = {"role": "system", "content": RAG_SYSTEM_TEMPLATE}
+    user_message = {"role": "user", "content": RAG_USER_TEMPLATE.format(context=context, context_count=len(hits), user_query=question)}
+
+    return [system_message, user_message]
 
 
 def answer(question: str, hits: list[Hit]) -> str:
@@ -41,4 +75,7 @@ def answer(question: str, hits: list[Hit]) -> str:
     then dig out `.choices[0].message.content`. Look up what `temperature`
     does to your results when you run the same question twice.
     """
-    raise NotImplementedError("Write answer() in retrieval_app/answer.py")
+    messages = build_messages(question, hits)
+    response = client().chat.completions.create(model=CHAT_MODEL, messages=messages, temperature=0.5)
+    return response.choices[0].message.content
+
