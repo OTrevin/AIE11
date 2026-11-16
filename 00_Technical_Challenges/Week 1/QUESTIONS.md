@@ -15,4 +15,4 @@ Questions asked:
 | 9 | Needs 2+ chunks | how does the guide say to practice progressive muscle relaxation, and what are two ways it suggests staying connected with others over time? | Chapter 11: Tense and release muscle groups from toes to head. Chapter 20: Give two suggestions, such as scheduling regular check-ins with friends and family and joining a group aligned with your interests. | ✅ | both parts were retrived, chapter 11 and 20 | ✅ |
 | 10 | Decline (off-topic) | How do I rename a local Git branch? | Decline to asnwer | ✅ | It aswerred with my decline | ✅ |
 
-**Score:** before 8/10 // after __/10
+**Score:** before 8/10 -> after 9/10
