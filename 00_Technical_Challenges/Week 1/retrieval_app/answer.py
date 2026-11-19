@@ -76,5 +76,5 @@ def answer(question: str, hits: list[Hit]) -> str:
     does to your results when you run the same question twice.
     """
     messages = build_messages(question, hits)
-    response = client().chat.completions.create(model=CHAT_MODEL, messages=messages, temperature=0.5)
+    response = client().chat.completions.create(model=CHAT_MODEL, messages=messages, temperature=0)
     return response.choices[0].message.content
